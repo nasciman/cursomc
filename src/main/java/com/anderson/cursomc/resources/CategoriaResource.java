@@ -1,6 +1,8 @@
 package com.anderson.cursomc.resources;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.anderson.cursomc.domain.Categoria;
+import com.anderson.cursomc.dto.CategoriaDTO;
 import com.anderson.cursomc.services.CategoriaService;
 import com.anderson.cursomc.services.exceptions.DataIntegrityException;
 
@@ -24,10 +27,18 @@ public class CategoriaResource {
 	private CategoriaService service;
 	
 	@RequestMapping(value="/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Categoria> listar(@PathVariable Integer id) {
+	public ResponseEntity<Categoria> find(@PathVariable Integer id) {
 		
 		Categoria obj = service.find(id);
 		return ResponseEntity.ok(obj);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<CategoriaDTO>> findAll() {
+		
+		List<Categoria> list = service.findAll();
+		List<CategoriaDTO> listDto = list.stream().map(categoria -> new CategoriaDTO(categoria)).collect(Collectors.toList());
+		return ResponseEntity.ok(listDto);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -46,7 +57,7 @@ public class CategoriaResource {
 		
 		return ResponseEntity.noContent().build();
 	}
-
+	
 	@RequestMapping(value="/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		
